@@ -2,7 +2,7 @@ import { Schema, model, models } from "mongoose";
 
 const companySchema = new Schema(
   {
-    name: { type: String, required: true, trim: true },
+    name: { type: String, required: true, trim: true, },
     symbol: { type: String, required: true, unique: true, trim: true },
   },
   {
