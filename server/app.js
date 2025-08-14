@@ -28,6 +28,7 @@ app.use(express.urlencoded({ extended: true, limit: "400kb" }));
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5001",
+  "http://localhost:5002",
   process.env.CORS_ORIGIN,
 ].filter(Boolean);
 

@@ -11,11 +11,10 @@ import {
 const router = express.Router();
 
 router.route("/company").get(getAllCompanies).post(setCompanyRecord);
-
 router.route("/company/:id").put(updateCompanyInfoById);
 
 // stock data
-router.get("/stock", getStockData);
-router.get("/predict/:symbol", handlePrediction);
+router.post("/stock", getStockData);
+router.post("/predict", handlePrediction);
 
 export default router;
