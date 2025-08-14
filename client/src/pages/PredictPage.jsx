@@ -57,144 +57,143 @@ const PredictPage = () => {
   };
 
   // Core logic for analysis
-const handleAnalyze = async () => {
-  const companyName =
-    selectedCompany === "__custom__" ? customCompany.trim() : selectedCompany;
-  const companySymbol =
-    selectedCompany === "__custom__"
-      ? customSymbol.trim().toUpperCase()
-      : symbol;
+  const handleAnalyze = async () => {
+    const companyName =
+      selectedCompany === "__custom__" ? customCompany.trim() : selectedCompany;
+    const companySymbol =
+      selectedCompany === "__custom__"
+        ? customSymbol.trim().toUpperCase()
+        : symbol;
 
-  if (!companyName || !companySymbol || !period1 || !period2) {
-    alert("Please fill in all fields correctly.");
-    return;
-  }
+    if (!companyName || !companySymbol || !period1 || !period2) {
+      alert("Please fill in all fields correctly.");
+      return;
+    }
 
-  if (new Date(period1) >= new Date(period2)) {
-    alert("Start date must be before end date.");
-    return;
-  }
+    if (new Date(period1) >= new Date(period2)) {
+      alert("Start date must be before end date.");
+      return;
+    }
 
-  if (new Date(period2) > new Date()) {
-    alert("End date cannot be in the future.");
-    return;
-  }
+    if (new Date(period2) > new Date()) {
+      alert("End date cannot be in the future.");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    // Reset states
-    setAnalysisResult(null);
-    setChartData(null);
+    try {
+      // Reset states
+      setAnalysisResult(null);
+      setChartData(null);
 
-    // 1) Save custom company to DB if needed
-    if (selectedCompany === "__custom__") {
-      const alreadyExists = companies.some(
-        (comp) =>
-          comp.name.trim().toLowerCase() === companyName.toLowerCase() ||
-          comp.symbol.toUpperCase() === companySymbol.toUpperCase()
-      );
+      // 1) Save custom company to DB if needed
+      if (selectedCompany === "__custom__") {
+        const alreadyExists = companies.some(
+          (comp) =>
+            comp.name.trim().toLowerCase() === companyName.toLowerCase() ||
+            comp.symbol.toUpperCase() === companySymbol.toUpperCase()
+        );
 
-      if (!alreadyExists) {
-        try {
-          const saveRes = await api.post("/company", {
-            name: companyName,
-            symbol: companySymbol,
-          });
+        if (!alreadyExists) {
+          try {
+            const saveRes = await api.post("/company", {
+              name: companyName,
+              symbol: companySymbol,
+            });
 
-          const saveJson = saveRes.data;
+            const saveJson = saveRes.data;
 
-          if (saveJson.success && saveJson.data) {
-            setCompanies((prev) => [...prev, saveJson.data]);
-          } else {
-            console.warn("Failed to save company:", saveJson.message);
+            if (saveJson.success && saveJson.data) {
+              setCompanies((prev) => [...prev, saveJson.data]);
+            } else {
+              console.warn("Failed to save company:", saveJson.message);
+            }
+          } catch (saveErr) {
+            console.error("Error saving company:", saveErr);
           }
-        } catch (saveErr) {
-          console.error("Error saving company:", saveErr);
         }
       }
+
+      // 2) Get historical stock data
+      const stockRes = await api.post("/stock", {
+        name: companyName,
+        symbol: companySymbol,
+        period1,
+        period2,
+      });
+
+      const stockJson = stockRes.data;
+
+      if (!stockJson.success || !Array.isArray(stockJson.data)) {
+        alert(stockJson.message || "Failed to fetch stock data.");
+        return;
+      }
+
+      const historicalData = stockJson.data;
+
+      if (historicalData.length === 0) {
+        alert("No historical data found for the given period.");
+        return;
+      }
+
+      const labels = historicalData.map((entry) => entry.date);
+      const closePrices = historicalData.map((entry) =>
+        parseFloat(entry.close.toFixed(2))
+      );
+
+      // 3) Get prediction from backend
+      const predictRes = await api.post("/predict", {
+        symbol: companySymbol,
+        data: historicalData,
+        method, // "average" or "linear-regression"
+      });
+
+      const predictJson = predictRes.data;
+
+      if (
+        !predictJson.success ||
+        !predictJson.predictedPrice ||
+        isNaN(predictJson.predictedPrice)
+      ) {
+        alert(predictJson.message || "Prediction failed.");
+        return;
+      }
+
+      const lastDate = new Date(labels[labels.length - 1]);
+      lastDate.setDate(lastDate.getDate() + 1);
+      const predictedDate = lastDate.toISOString().split("T")[0];
+
+      const updatedLabels = [...labels, predictedDate];
+      const updatedPrices = [...closePrices, predictJson.predictedPrice];
+
+      setChartData({
+        labels: updatedLabels,
+        datasets: [
+          {
+            label: "Close Price",
+            data: updatedPrices,
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            fill: false,
+            tension: 0.3,
+            pointBackgroundColor: updatedPrices.map((_, idx) =>
+              idx === updatedPrices.length - 1 ? "#ef4444" : "#3b82f6"
+            ),
+          },
+        ],
+      });
+
+      setAnalysisResult(
+        `Predicted price for ${companyName} (${companySymbol}) on ${predictedDate}---->>> ${predictJson.predictedPrice}`
+      );
+    } catch (err) {
+      console.error("Error during analysis:", err);
+      alert("An error occurred during analysis. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    // 2) Get historical stock data
-    const stockRes = await api.post("/stock", {
-      name: companyName,
-      symbol: companySymbol,
-      period1,
-      period2,
-    });
-
-    const stockJson = stockRes.data;
-
-    if (!stockJson.success || !Array.isArray(stockJson.data)) {
-      alert(stockJson.message || "Failed to fetch stock data.");
-      return;
-    }
-
-    const historicalData = stockJson.data;
-
-    if (historicalData.length === 0) {
-      alert("No historical data found for the given period.");
-      return;
-    }
-
-    const labels = historicalData.map((entry) => entry.date);
-    const closePrices = historicalData.map((entry) =>
-      parseFloat(entry.close.toFixed(2))
-    );
-
-    // 3) Get prediction from backend
-    const predictRes = await api.post("/predict", {
-      symbol: companySymbol,
-      data: historicalData,
-      method, // "average" or "linear-regression"
-    });
-
-    const predictJson = predictRes.data;
-
-    if (
-      !predictJson.success ||
-      !predictJson.predictedPrice ||
-      isNaN(predictJson.predictedPrice)
-    ) {
-      alert(predictJson.message || "Prediction failed.");
-      return;
-    }
-
-    const lastDate = new Date(labels[labels.length - 1]);
-    lastDate.setDate(lastDate.getDate() + 1);
-    const predictedDate = lastDate.toISOString().split("T")[0];
-
-    const updatedLabels = [...labels, predictedDate];
-    const updatedPrices = [...closePrices, predictJson.predictedPrice];
-
-    setChartData({
-      labels: updatedLabels,
-      datasets: [
-        {
-          label: "Close Price",
-          data: updatedPrices,
-          borderColor: "#3b82f6",
-          backgroundColor: "rgba(59, 130, 246, 0.1)",
-          fill: false,
-          tension: 0.3,
-          pointBackgroundColor: updatedPrices.map((_, idx) =>
-            idx === updatedPrices.length - 1 ? "#ef4444" : "#3b82f6"
-          ),
-        },
-      ],
-    });
-
-    setAnalysisResult(
-      `Predicted price for ${companyName} (${companySymbol}) on ${predictedDate}---->>> ${predictJson.predictedPrice}`
-    );
-  } catch (err) {
-    console.error("Error during analysis:", err);
-    alert("An error occurred during analysis. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   useEffect(() => {
     setAnalysisResult(null);

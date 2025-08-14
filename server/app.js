@@ -4,9 +4,9 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import startServer from "./server.js";
+import startServer from "./src/server.js";
 import errorHandler from "./src/middlewares/errorHandler.js";
-import infoRoutes from "./src/routes/info.routes.js"
+import infoRoutes from "./src/routes/info.routes.js";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -26,9 +26,9 @@ app.use(express.urlencoded({ extended: true, limit: "400kb" }));
 // CORS Setup (Dev Only)
 // ---------------------------
 const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5001",
-  "http://localhost:5002",
+  "http://localhost:5173", // client
+  "http://localhost:5001", // server
+  "http://localhost:5002",// ml-service python
   process.env.CORS_ORIGIN,
 ].filter(Boolean);
 
@@ -51,7 +51,7 @@ if (process.env.NODE_ENV !== "production") {
 // API Route Handlers
 // ---------------------------
 
-app.use("/api",infoRoutes)
+app.use("/api", infoRoutes);
 
 // ---------------------------
 // Serve Static Frontend Assets (Production)
