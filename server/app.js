@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true, limit: "400kb" }));
 const allowedOrigins = [
   "http://localhost:5173", // client
   "http://localhost:5001", // server
-  "http://localhost:5002",// ml-service python
+  process.env.ML_SERVICE_URL, // ml-service(python)
   process.env.CORS_ORIGIN,
 ].filter(Boolean);
 

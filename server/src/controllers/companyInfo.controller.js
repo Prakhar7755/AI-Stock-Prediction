@@ -172,7 +172,7 @@ const handlePrediction = async (req, res) => {
     }
 
     // Send to Flask AI service
-    const response = await axios.post("http://localhost:5002/predict", {
+    const response = await axios.post(`${process.env.ML_SERVICE_URL}/predict`, {
       prices: closingPrices,
       method,
     });

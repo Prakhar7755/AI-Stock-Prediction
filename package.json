@@ -1,0 +1,14 @@
+{
+  "name": "project-x",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+ "scripts": {
+    "build": "yarn --cwd server install && yarn --cwd client install && yarn --cwd client build",
+    "start": "yarn --cwd server start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
