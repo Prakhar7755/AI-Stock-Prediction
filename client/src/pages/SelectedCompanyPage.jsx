@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Line } from "react-chartjs-2";
+import api from "../lib/axios";
 
 const SelectedCompanyPage = () => {
   const [searchParams] = useSearchParams();
@@ -17,6 +18,7 @@ const SelectedCompanyPage = () => {
     .toISOString()
     .split("T")[0];
 
+  // fetch data
   const fetchData = useCallback(async () => {
     if (!companyName || !symbol) {
       alert("Name and Symbol are required.");
@@ -27,15 +29,14 @@ const SelectedCompanyPage = () => {
       setLoading(true);
 
       // 1. Fetch stock data
-      const stockRes = await fetch("http://localhost:5001/api/stock", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: companyName, symbol, period1, period2 }),
+      const stockRes = await api.post("/stock", {
+        name: companyName,
+        symbol,
+        period1,
+        period2,
       });
 
-      const stockJson = await stockRes.json();
+      const stockJson = stockRes.data;
 
       if (!stockJson.success || !Array.isArray(stockJson.data)) {
         alert(stockJson.message || "Failed to fetch stock data.");
@@ -50,19 +51,13 @@ const SelectedCompanyPage = () => {
       }
 
       // 2. Get prediction
-      const predictRes = await fetch("http://localhost:5001/api/predict", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          symbol,
-          data: historicalData,
-          method: "linear-regression", // or "average"
-        }),
+      const predictRes = await api.post("/predict", {
+        symbol,
+        data: historicalData,
+        method: "linear-regression", // or "average"
       });
 
-      const predictJson = await predictRes.json();
+      const predictJson = predictRes.data;
 
       if (!predictJson.success || !predictJson.predictedPrice) {
         alert("Prediction failed.");
