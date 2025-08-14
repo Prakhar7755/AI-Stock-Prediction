@@ -132,6 +132,20 @@ dist
 !.yarn/versions
 
 
-client/
 *.md
-ml-service/
+
+
+# Ignore virtual environment
+venv/
+
+# Optional: Bytecode and Python cache
+__pycache__/
+*.py[cod]
+
+# Optional: VS Code or PyCharm settings
+.vscode/
+.idea/
+
+# Optional: OS-specific files
+.DS_Store
+Thumbs.db
