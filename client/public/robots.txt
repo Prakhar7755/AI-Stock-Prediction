@@ -1,0 +1,5 @@
+# client/public/robots.txt
+User-agent: *
+Disallow:
+
+Sitemap: https://ai-stock-prediction-dfv1.onrender.com/sitemap.xml

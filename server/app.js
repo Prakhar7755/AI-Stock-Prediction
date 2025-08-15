@@ -16,7 +16,6 @@ const PORT = process.env.PORT || 5001;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const clientPath = path.join(__dirname, "../client/dist"); // for local development or deployment without docker
-// const clientPath = path.join(__dirname, "client/dist"); // for docker deployment
 
 
 // ---------------------------
@@ -24,7 +23,16 @@ const clientPath = path.join(__dirname, "../client/dist"); // for local developm
 // ---------------------------
 app.use(express.json({ limit: "400kb" }));
 app.use(express.urlencoded({ extended: true, limit: "400kb" }));
-app.use(helmet());
+app.use(
+  helmet({
+    hsts: {
+      maxAge: 63072000, // 2 years in seconds
+      includeSubDomains: true,
+      preload: true,
+    },
+  })
+);
+
 
 // ---------------------------
 // CORS Setup (Dev Only)

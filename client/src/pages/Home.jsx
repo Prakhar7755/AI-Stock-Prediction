@@ -21,7 +21,12 @@ export default function Home() {
       </Link>
 
       <div className="mt-20 opacity-20 ">
-        <img src="/svg1.svg" alt="logo" className="w-20 h-20 mx-auto" />
+        <img
+          src="/svg1.svg"
+          alt="logo"
+          className="w-20 h-20 mx-auto"
+          loading={"lazy"}
+        />
       </div>
     </div>
   );
