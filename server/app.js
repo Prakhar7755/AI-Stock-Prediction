@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import helmet from "helmet";
 
 import startServer from "./src/server.js";
 import errorHandler from "./src/middlewares/errorHandler.js";
@@ -14,13 +15,16 @@ const PORT = process.env.PORT || 5001;
 // Get directory name from ES module context
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const clientPath = path.join(__dirname, "../client/dist");
+// const clientPath = path.join(__dirname, "../client/dist");
+const clientPath = path.join(__dirname, "client/dist");
+
 
 // ---------------------------
 // Global Middleware Setup
 // ---------------------------
 app.use(express.json({ limit: "400kb" }));
 app.use(express.urlencoded({ extended: true, limit: "400kb" }));
+app.use(helmet());
 
 // ---------------------------
 // CORS Setup (Dev Only)
@@ -51,6 +55,7 @@ if (process.env.NODE_ENV !== "production") {
 // API Route Handlers
 // ---------------------------
 
+app.get("/api/health", (req, res) => res.json({ status: "OK" })); // health check
 app.use("/api", infoRoutes);
 
 // ---------------------------
