@@ -24,7 +24,9 @@ RUN cd server && yarn install
 COPY server ./server
 
 # Copy frontend build into backend's public folder
-COPY --from=client-build /app/client/dist ./server/client/dist
+# COPY --from=client-build /app/client/dist ./server/client/dist
+COPY --from=client-build /app/client/dist ./client/dist
+
 
 # Set environment to production
 ENV NODE_ENV=production
