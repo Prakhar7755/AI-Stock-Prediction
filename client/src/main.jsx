@@ -22,7 +22,7 @@ createRoot(document.getElementById("root")).render(
             </div>
             <div className="drawer-side">
               <label htmlFor="my-drawer" className="drawer-overlay"></label>
-              <Sidebar /> 
+              <Sidebar />
             </div>
           </div>
         </main>

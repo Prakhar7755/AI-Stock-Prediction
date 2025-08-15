@@ -17,7 +17,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const clientPath = path.join(__dirname, "../client/dist"); // for local development or deployment without docker
 
-
 // ---------------------------
 // Global Middleware Setup
 // ---------------------------
@@ -32,7 +31,6 @@ app.use(
     },
   })
 );
-
 
 // ---------------------------
 // CORS Setup (Dev Only)

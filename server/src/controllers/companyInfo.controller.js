@@ -25,7 +25,9 @@ const getAllCompanies = async (_, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error. Please try again later.",
-      ...(process.env.NODE_ENV !== "production" && { error: err.message }),
+      ...(process.env.NODE_ENV !== "production" && {
+        error: err.message,
+      }),
     });
   }
 };
@@ -55,7 +57,9 @@ const setCompanyRecord = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error. Please try again later.",
-      ...(process.env.NODE_ENV !== "production" && { error: err.message }),
+      ...(process.env.NODE_ENV !== "production" && {
+        error: err.message,
+      }),
     });
   }
 };
@@ -104,7 +108,9 @@ const updateCompanyInfoById = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error. Please try again later.",
-      ...(process.env.NODE_ENV !== "production" && { error: err.message }),
+      ...(process.env.NODE_ENV !== "production" && {
+        error: err.message,
+      }),
     });
   }
 };
@@ -143,7 +149,9 @@ const getStockData = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error. Please try again later.",
-      ...(process.env.NODE_ENV !== "production" && { error: err.message }),
+      ...(process.env.NODE_ENV !== "production" && {
+        error: err.message,
+      }),
     });
   }
 };
@@ -189,7 +197,9 @@ const handlePrediction = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to generate prediction.",
-      ...(process.env.NODE_ENV !== "production" && { error: err.message }),
+      ...(process.env.NODE_ENV !== "production" && {
+        error: err.message,
+      }),
     });
   }
 };

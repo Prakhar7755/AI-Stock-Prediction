@@ -4,7 +4,9 @@ export async function getHistoricalData(symbol, period1Input, period2Input) {
   try {
     const now = new Date();
     // Parse input dates or fallback to default last 7 days
-    const period1 = period1Input ? new Date(period1Input) : new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const period1 = period1Input
+      ? new Date(period1Input)
+      : new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const period2 = period2Input ? new Date(period2Input) : now;
 
     // Validate that period1 <= period2 (optional)
@@ -27,7 +29,10 @@ export async function getHistoricalData(symbol, period1Input, period2Input) {
     }
 
     const formatted = result.quotes.map((q) => ({
-      date: (typeof q.date === "string" ? q.date : q.date?.toISOString())?.split("T")[0],
+      date: (typeof q.date === "string"
+        ? q.date
+        : q.date?.toISOString()
+      )?.split("T")[0],
       open: q.open,
       high: q.high,
       low: q.low,
@@ -41,4 +46,3 @@ export async function getHistoricalData(symbol, period1Input, period2Input) {
     return null;
   }
 }
-

@@ -206,13 +206,13 @@ const PredictPage = () => {
         Predict Stock Prices
       </h1>
       <div className="grid gap-6">
-        {/*  */}
         {/* Company Selector */}
         <div>
-          <label className="label">
+          <label htmlFor="company-select" className="label">
             <span className="label-text">Select Company</span>
           </label>
           <select
+            id="company-select"
             className="select select-bordered w-full"
             value={selectedCompany}
             onChange={handleCompanyChange}
@@ -232,14 +232,15 @@ const PredictPage = () => {
           </select>
         </div>
 
-        {/* Conditional Input for Symbol or Manual Entry */}
+        {/* Conditional Input for Custom Entry */}
         {selectedCompany === "__custom__" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="label">
+              <label htmlFor="custom-company" className="label">
                 <span className="label-text">Enter Company Name</span>
               </label>
               <input
+                id="custom-company"
                 type="text"
                 className="input input-bordered w-full"
                 value={customCompany}
@@ -249,7 +250,7 @@ const PredictPage = () => {
             </div>
 
             <div>
-              <label className="label">
+              <label htmlFor="custom-symbol" className="label">
                 <span className="label-text">
                   Enter Company Symbol
                   <span
@@ -261,6 +262,7 @@ const PredictPage = () => {
                 </span>
               </label>
               <input
+                id="custom-symbol"
                 type="text"
                 className="input input-bordered w-full uppercase"
                 value={customSymbol}
@@ -271,10 +273,11 @@ const PredictPage = () => {
           </div>
         ) : (
           <div>
-            <label className="label">
+            <label htmlFor="readonly-symbol" className="label">
               <span className="label-text">Company Symbol</span>
             </label>
             <input
+              id="readonly-symbol"
               type="text"
               className="input input-bordered w-full"
               value={symbol}
@@ -283,12 +286,13 @@ const PredictPage = () => {
           </div>
         )}
 
-        {/* PREDICTION METHOD */}
+        {/* Prediction Method */}
         <div>
-          <label className="label">
+          <label htmlFor="method-select" className="label">
             <span className="label-text">Prediction Method</span>
           </label>
           <select
+            id="method-select"
             className="select select-bordered w-full"
             value={method}
             onChange={(e) => setMethod(e.target.value)}
@@ -301,10 +305,11 @@ const PredictPage = () => {
         {/* Date Range Picker */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="label">
+            <label htmlFor="start-date" className="label">
               <span className="label-text">Start Date</span>
             </label>
             <input
+              id="start-date"
               type="date"
               className="input input-bordered w-full"
               value={period1}
@@ -313,10 +318,11 @@ const PredictPage = () => {
           </div>
 
           <div>
-            <label className="label">
+            <label htmlFor="end-date" className="label">
               <span className="label-text">End Date</span>
             </label>
             <input
+              id="end-date"
               type="date"
               className="input input-bordered w-full"
               value={period2}
@@ -381,6 +387,188 @@ const PredictPage = () => {
       )}
     </div>
   );
+
+  // return (
+  //   <div className="max-w-4xl mx-auto px-4 py-10">
+  //     <h1 className="text-3xl font-bold mb-8 text-center text-primary">
+  //       Predict Stock Prices
+  //     </h1>
+  //     <div className="grid gap-6">
+  //       {/*  */}
+  //       {/* Company Selector */}
+  //       <div>
+  //         <label className="label">
+  //           <span className="label-text">Select Company</span>
+  //         </label>
+  //         <select
+  //           className="select select-bordered w-full"
+  //           value={selectedCompany}
+  //           onChange={handleCompanyChange}
+  //           disabled={companiesLoading}
+  //         >
+  //           <option disabled value="">
+  //             {companiesLoading
+  //               ? 'Loading companies...'
+  //               : '-- Choose a company --'}
+  //           </option>
+  //           {companies.map((company) => (
+  //             <option key={company._id} value={company.name}>
+  //               {company.name}
+  //             </option>
+  //           ))}
+  //           <option value="__custom__">Other (Enter manually)</option>
+  //         </select>
+  //       </div>
+
+  //       {/* Conditional Input for Symbol or Manual Entry */}
+  //       {selectedCompany === '__custom__' ? (
+  //         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  //           <div>
+  //             <label className="label">
+  //               <span className="label-text">Enter Company Name</span>
+  //             </label>
+  //             <input
+  //               type="text"
+  //               className="input input-bordered w-full"
+  //               value={customCompany}
+  //               onChange={(e) => setCustomCompany(e.target.value)}
+  //               placeholder="e.g., MyStartup Inc."
+  //             />
+  //           </div>
+
+  //           <div>
+  //             <label className="label">
+  //               <span className="label-text">
+  //                 Enter Company Symbol
+  //                 <span
+  //                   className="tooltip ml-1"
+  //                   data-tip="e.g., SBIN.NS, INFY.BO, TCS.NS"
+  //                 >
+  //                   ❔
+  //                 </span>
+  //               </span>
+  //             </label>
+  //             <input
+  //               type="text"
+  //               className="input input-bordered w-full uppercase"
+  //               value={customSymbol}
+  //               onChange={(e) => setCustomSymbol(e.target.value.toUpperCase())}
+  //               placeholder="e.g., MSTP"
+  //             />
+  //           </div>
+  //         </div>
+  //       ) : (
+  //         <div>
+  //           <label className="label">
+  //             <span className="label-text">Company Symbol</span>
+  //           </label>
+  //           <input
+  //             type="text"
+  //             className="input input-bordered w-full"
+  //             value={symbol}
+  //             readOnly
+  //           />
+  //         </div>
+  //       )}
+
+  //       {/* PREDICTION METHOD */}
+  //       <div>
+  //         <label className="label">
+  //           <span className="label-text">Prediction Method</span>
+  //         </label>
+  //         <select
+  //           className="select select-bordered w-full"
+  //           value={method}
+  //           onChange={(e) => setMethod(e.target.value)}
+  //         >
+  //           <option value="linear-regression">Linear Regression</option>
+  //           <option value="average">Average</option>
+  //         </select>
+  //       </div>
+
+  //       {/* Date Range Picker */}
+  //       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  //         <div>
+  //           <label className="label">
+  //             <span className="label-text">Start Date</span>
+  //           </label>
+  //           <input
+  //             type="date"
+  //             className="input input-bordered w-full"
+  //             value={period1}
+  //             onChange={(e) => setPeriod1(e.target.value)}
+  //           />
+  //         </div>
+
+  //         <div>
+  //           <label className="label">
+  //             <span className="label-text">End Date</span>
+  //           </label>
+  //           <input
+  //             type="date"
+  //             className="input input-bordered w-full"
+  //             value={period2}
+  //             onChange={(e) => setPeriod2(e.target.value)}
+  //           />
+  //         </div>
+  //       </div>
+
+  //       {/* Analyze Button */}
+  //       <div className="text-center mt-4">
+  //         <button
+  //           className="btn btn-primary btn-wide"
+  //           onClick={handleAnalyze}
+  //           disabled={
+  //             loading ||
+  //             !period1 ||
+  //             !period2 ||
+  //             (selectedCompany === '__custom__'
+  //               ? !customCompany || !customSymbol
+  //               : !symbol)
+  //           }
+  //         >
+  //           {loading ? (
+  //             <>
+  //               <span className="loading loading-spinner loading-sm"></span>{' '}
+  //               Analyzing...
+  //             </>
+  //           ) : (
+  //             'Analyze'
+  //           )}
+  //         </button>
+  //       </div>
+  //     </div>
+
+  //     {/* Loading Spinner While Processing */}
+  //     {loading && (
+  //       <div className="mt-6 text-center">
+  //         <span className="loading loading-spinner text-primary loading-lg"></span>
+  //         <p className="mt-4 text-base-content">Processing...</p>
+  //       </div>
+  //     )}
+
+  //     {/* Result Section */}
+  //     {analysisResult && (
+  //       <div className="mt-10 text-center text-lg text-base-content/80">
+  //         {analysisResult}
+  //       </div>
+  //     )}
+
+  //     {/* NO CHART */}
+  //     {!chartData && !loading && !analysisResult && (
+  //       <div className="mt-10 text-center text-base-content/60">
+  //         Start by selecting a company and date range to predict stock prices.
+  //       </div>
+  //     )}
+
+  //     {/* Chart Section */}
+  //     {chartData && (
+  //       <div className="mt-10 bg-base-200 p-6 rounded-box">
+  //         <Line data={chartData} />
+  //       </div>
+  //     )}
+  //   </div>
+  // );
 };
 
 export default PredictPage;
