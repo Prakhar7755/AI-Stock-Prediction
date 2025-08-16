@@ -362,7 +362,7 @@ const PredictPage = () => {
       {loading && (
         <div className="mt-6 text-center">
           <span className="loading loading-spinner text-primary loading-lg"></span>
-          <p className="mt-4 text-base-content">Processing...</p>
+          <p className="mt-4 text-base-content">Processing...   incase of error <a className="text-red-700" href="https://ai-stock-prediction-ml-service-1.onrender.com/health">CLICK HERE</a> and then come back</p>
         </div>
       )}
 
@@ -375,8 +375,10 @@ const PredictPage = () => {
 
       {/* NO CHART */}
       {!chartData && !loading && !analysisResult && (
+        
         <div className="mt-10 text-center text-base-content/60">
           Start by selecting a company and date range to predict stock prices.
+        <a className="text-red-700" href="https://ai-stock-prediction-ml-service-1.onrender.com/health">CLICK here for any Error</a>
         </div>
       )}
 
