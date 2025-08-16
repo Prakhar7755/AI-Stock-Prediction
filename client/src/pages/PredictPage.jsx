@@ -9,7 +9,8 @@ const PredictPage = () => {
   const [customCompany, setCustomCompany] = useState("");
   const [customSymbol, setCustomSymbol] = useState("");
   const [period1, setPeriod1] = useState("");
-  const [period2, setPeriod2] = useState("");
+  // const [period2, setPeriod2] = useState("");
+  const [period2, setPeriod2] = useState(new Date(Date.now() - 86400000).toISOString().split('T')[0]);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -185,11 +186,11 @@ const PredictPage = () => {
       });
 
       setAnalysisResult(
-        `Predicted price for ${companyName} (${companySymbol}) on ${predictedDate}---->>> ${predictJson.predictedPrice}`
+        `Predicted price for ${companyName} (${companySymbol}) on ${predictedDate}   ---->   ${predictJson.predictedPrice}`
       );
     } catch (err) {
       console.error("Error during analysis:", err);
-      alert("An error occurred during analysis. Please try again.");
+      alert("FLASK/PYTHON :: An error occurred during analysis. Please try again.");
     } finally {
       setLoading(false);
     }

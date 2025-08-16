@@ -196,7 +196,7 @@ const handlePrediction = async (req, res) => {
     console.error("🔥 Prediction error:", err.message);
     return res.status(500).json({
       success: false,
-      message: "Failed to generate prediction.",
+      message: "NO RESPONSE FROM PYTHON/FLASK API. Failed to generate prediction.",
       ...(process.env.NODE_ENV !== "production" && {
         error: err.message,
       }),

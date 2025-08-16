@@ -60,7 +60,7 @@ const SelectedCompanyPage = () => {
       const predictJson = predictRes.data;
 
       if (!predictJson.success || !predictJson.predictedPrice) {
-        alert("Prediction failed.");
+        alert("Prediction failed DUE TO PYTHON/FLASK deployment");
         return;
       }
 
