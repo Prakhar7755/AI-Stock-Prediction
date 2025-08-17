@@ -18,12 +18,6 @@ const Sidebar = () => {
     <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4 overflow-y-auto">
       {companies.map(({ name, symbol }) => (
         <li key={symbol} className="mb-2">
-          {/* <Link
-            to={`/selectedCompany/${encodeURIComponent(symbol)}`}
-            className="hover:bg-blue-200 rounded px-2 py-1 block"
-          >
-            {name}
-          </Link> */}
           <Link
             to={`/selectedCompany?symbol=${encodeURIComponent(
               symbol
