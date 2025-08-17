@@ -1,14 +1,18 @@
-import mongoose from "mongoose";
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/db.js";
 
-const companySchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true, trim: true },
-    symbol: { type: String, required: true, unique: true, trim: true },
+const CompanyModel = sequelize.define("Company", {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
-  {
-    timestamps: true,
-  }
-);
+  symbol: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+}, {
+  timestamps: true, 
+});
 
-export const CompanyModel =
-  mongoose.models.Company || mongoose.model("Company", companySchema);
+export { CompanyModel };

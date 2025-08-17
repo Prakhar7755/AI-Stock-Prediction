@@ -8,6 +8,8 @@ import helmet from "helmet";
 import startServer from "./src/server.js";
 import errorHandler from "./src/middlewares/errorHandler.js";
 import infoRoutes from "./src/routes/info.routes.js";
+import { sequelize } from "./src/config/db.js";
+
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -61,7 +63,16 @@ if (process.env.NODE_ENV !== "production") {
 // API Route Handlers
 // ---------------------------
 
-app.get("/api/health", (req, res) => res.json({ status: "OK" })); // health check
+app.get("/health", async (_, res) => {
+  try {
+    await sequelize.authenticate();
+    res.send("✅ PostgreSQL connection is healthy.");
+  } catch {
+    res.status(500).send("❌ PostgreSQL connection failed.");
+  }
+});
+
+app.get("/api/health", (_, res) => res.json({ status: "OK" })); // health check
 app.use("/api", infoRoutes);
 
 // ---------------------------

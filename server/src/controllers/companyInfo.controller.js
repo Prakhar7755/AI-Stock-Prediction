@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import axios from "axios";
 
 import { CompanyModel } from "../models/company.model.js";
@@ -6,9 +5,9 @@ import { getHistoricalData } from "../utils/getHistoricalData.js";
 
 const getAllCompanies = async (_, res) => {
   try {
-    const companies = await CompanyModel.find();
+    const companies = await CompanyModel.findAll();
 
-    if (companies.length === 0) {
+    if (!companies.length) {
       return res.status(404).json({
         success: false,
         message: "No companies found.",
@@ -17,17 +16,15 @@ const getAllCompanies = async (_, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Companies list fetched successfully.",
+      message: "Companies fetched successfully.",
       companies,
     });
   } catch (err) {
-    console.error("🔥 Error while fetching the companies:", err.message);
+    console.error("🔥 Error fetching companies:", err.message);
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error. Please try again later.",
-      ...(process.env.NODE_ENV !== "production" && {
-        error: err.message,
-      }),
+      message: "Internal Server Error.",
+      ...(process.env.NODE_ENV !== "production" && { error: err.message }),
     });
   }
 };
@@ -36,6 +33,7 @@ const setCompanyRecord = async (req, res) => {
   try {
     const { name, symbol } = req.body;
 
+    // validate input
     if (!name?.trim() || !symbol?.trim()) {
       return res.status(400).json({
         success: false,
@@ -43,7 +41,11 @@ const setCompanyRecord = async (req, res) => {
       });
     }
 
-    const newRecord = await CompanyModel.create({ name, symbol });
+    // create the new record
+    const newRecord = await CompanyModel.create({
+      name: name.trim(),
+      symbol: symbol.trim(),
+    });
 
     console.log("✅ New company record created:", newRecord.name);
 
@@ -52,14 +54,22 @@ const setCompanyRecord = async (req, res) => {
       message: "New company record created.",
       data: newRecord,
     });
+
   } catch (err) {
     console.error("🔥 Error creating the company record:", err.message);
+
+    // handle Sequelize unique constraint error
+    if (err.name === "SequelizeUniqueConstraintError") {
+      return res.status(409).json({
+        success: false,
+        message: "A company with this symbol already exists.",
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: "Internal Server Error. Please try again later.",
-      ...(process.env.NODE_ENV !== "production" && {
-        error: err.message,
-      }),
+      ...(process.env.NODE_ENV !== "production" && { error: err.message }),
     });
   }
 };
@@ -69,7 +79,8 @@ const updateCompanyInfoById = async (req, res) => {
     const { id } = req.params;
     const { name, symbol } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    // Basic format validation (assuming integer ID — adjust if UUID)
+    if (!Number.isInteger(Number(id))) {
       return res.status(400).json({
         success: false,
         message: "Invalid company ID format.",
@@ -83,34 +94,45 @@ const updateCompanyInfoById = async (req, res) => {
       });
     }
 
-    const updatedData = await CompanyModel.findByIdAndUpdate(
-      id,
-      { name, symbol },
-      { new: true }
+    // Update returns number of affected rows
+    const [updatedRows] = await CompanyModel.update(
+      { name: name.trim(), symbol: symbol.trim() },
+      { where: { id } }
     );
 
-    if (!updatedData) {
+    if (updatedRows === 0) {
       return res.status(404).json({
         success: false,
         message: "Company not found. Update failed.",
       });
     }
 
-    console.log("✅ Company data successfully updated:", updatedData);
+    // Fetch the updated record
+    const updatedCompany = await CompanyModel.findByPk(id);
+
+    console.log("✅ Company data successfully updated:", updatedCompany);
 
     return res.status(200).json({
       success: true,
       message: "Company details updated successfully.",
-      data: updatedData,
+      data: updatedCompany,
     });
+
   } catch (err) {
     console.error("🔥 Error updating the company record:", err.message);
+
+    // Handle uniqueness error on 'symbol'
+    if (err.name === "SequelizeUniqueConstraintError") {
+      return res.status(409).json({
+        success: false,
+        message: "A company with this symbol already exists.",
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: "Internal Server Error. Please try again later.",
-      ...(process.env.NODE_ENV !== "production" && {
-        error: err.message,
-      }),
+      ...(process.env.NODE_ENV !== "production" && { error: err.message }),
     });
   }
 };
@@ -119,12 +141,13 @@ const getStockData = async (req, res) => {
   try {
     const { name, symbol, period1, period2 } = req.body;
 
-    if (!name || !symbol || !period1 || !period2) {
+    if (!name?.trim() || !symbol?.trim() || !period1 || !period2) {
       return res.status(400).json({
         success: false,
         message: "Name, Symbol, Period 1 & 2 are all required.",
       });
     }
+
 
     const data = await getHistoricalData(symbol, period1, period2);
 
@@ -167,7 +190,7 @@ const handlePrediction = async (req, res) => {
       });
     }
 
-    // Extract closing prices from historical data
+    // extract closing prices from historical data
     const closingPrices = data
       .map((entry) => entry?.close)
       .filter((price) => typeof price === "number");
@@ -176,6 +199,14 @@ const handlePrediction = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Not enough valid closing prices in the dataset.",
+      });
+    }
+
+    if (!process.env.ML_SERVICE_URL) {
+      console.error("❌ ML_SERVICE_URL is not defined in env vars.");
+      return res.status(500).json({
+        success: false,
+        message: "Server misconfiguration. Prediction service URL is missing.",
       });
     }
 
