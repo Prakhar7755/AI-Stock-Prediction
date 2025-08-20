@@ -54,7 +54,6 @@ const setCompanyRecord = async (req, res) => {
       message: "New company record created.",
       data: newRecord,
     });
-
   } catch (err) {
     console.error("🔥 Error creating the company record:", err.message);
 
@@ -117,7 +116,6 @@ const updateCompanyInfoById = async (req, res) => {
       message: "Company details updated successfully.",
       data: updatedCompany,
     });
-
   } catch (err) {
     console.error("🔥 Error updating the company record:", err.message);
 
@@ -147,7 +145,6 @@ const getStockData = async (req, res) => {
         message: "Name, Symbol, Period 1 & 2 are all required.",
       });
     }
-
 
     const data = await getHistoricalData(symbol, period1, period2);
 
@@ -227,7 +224,8 @@ const handlePrediction = async (req, res) => {
     console.error("🔥 Prediction error:", err.message);
     return res.status(500).json({
       success: false,
-      message: "NO RESPONSE FROM PYTHON/FLASK API. Failed to generate prediction.",
+      message:
+        "NO RESPONSE FROM PYTHON/FLASK API. Failed to generate prediction.",
       ...(process.env.NODE_ENV !== "production" && {
         error: err.message,
       }),

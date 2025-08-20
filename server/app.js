@@ -10,7 +10,6 @@ import errorHandler from "./src/middlewares/errorHandler.js";
 import infoRoutes from "./src/routes/info.routes.js";
 import { sequelize } from "./src/config/db.js";
 
-
 const app = express();
 const PORT = process.env.PORT || 5001;
 

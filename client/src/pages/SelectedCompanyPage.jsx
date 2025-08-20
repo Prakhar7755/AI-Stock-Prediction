@@ -77,6 +77,7 @@ const SelectedCompanyPage = () => {
       labels.push(predictedDate);
       closePrices.push(predictJson.predictedPrice);
 
+      // 4. update chart data
       setChartData({
         labels,
         datasets: [

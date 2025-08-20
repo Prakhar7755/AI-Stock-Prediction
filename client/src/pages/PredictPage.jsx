@@ -10,7 +10,9 @@ const PredictPage = () => {
   const [customSymbol, setCustomSymbol] = useState("");
   const [period1, setPeriod1] = useState("");
   // const [period2, setPeriod2] = useState("");
-  const [period2, setPeriod2] = useState(new Date(Date.now() - 86400000).toISOString().split('T')[0]);
+  const [period2, setPeriod2] = useState(
+    new Date(Date.now() - 86400000).toISOString().split("T")[0]
+  );
   const [analysisResult, setAnalysisResult] = useState(null);
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -84,11 +86,11 @@ const PredictPage = () => {
     setLoading(true);
 
     try {
-      // Reset states
+      // reset      the states
       setAnalysisResult(null);
       setChartData(null);
 
-      // 1) Save custom company to DB if needed
+      // 1) save the new company to DB
       if (selectedCompany === "__custom__") {
         const alreadyExists = companies.some(
           (comp) =>
@@ -116,7 +118,7 @@ const PredictPage = () => {
         }
       }
 
-      // 2) Get historical stock data
+      // 2) get historical stock data
       const stockRes = await api.post("/stock", {
         name: companyName,
         symbol: companySymbol,
@@ -143,7 +145,7 @@ const PredictPage = () => {
         parseFloat(entry.close.toFixed(2))
       );
 
-      // 3) Get prediction from backend
+      // 3) get prediction from backend
       const predictRes = await api.post("/predict", {
         symbol: companySymbol,
         data: historicalData,
@@ -190,7 +192,9 @@ const PredictPage = () => {
       );
     } catch (err) {
       console.error("Error during analysis:", err);
-      alert("FLASK/PYTHON :: An error occurred during analysis. Please try again.");
+      alert(
+        "FLASK/PYTHON :: An error occurred during analysis. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -375,10 +379,15 @@ const PredictPage = () => {
 
       {/* NO CHART */}
       {!chartData && !loading && !analysisResult && (
-        
         <div className="mt-10 text-center text-base-content/60">
           Start by selecting a company and date range to predict stock prices.
-        <a className="text-red-700 font-bold" href="https://ai-stock-prediction-ml-service-1.onrender.com/health"> CLICK HERE FOR ANY ERROR</a>
+          <a
+            className="text-red-700 font-bold"
+            href="https://ai-stock-prediction-ml-service-1.onrender.com/health"
+          >
+            {" "}
+            CLICK HERE FOR ANY ERROR
+          </a>
         </div>
       )}
 
@@ -390,7 +399,6 @@ const PredictPage = () => {
       )}
     </div>
   );
-
 };
 
 export default PredictPage;

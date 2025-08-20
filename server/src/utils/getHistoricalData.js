@@ -3,13 +3,14 @@ import yahooFinance from "yahoo-finance2";
 export async function getHistoricalData(symbol, period1Input, period2Input) {
   try {
     const now = new Date();
-    // Parse input dates or fallback to default last 7 days
+
+    // parse input dates or fallback to default last 7 days
     const period1 = period1Input
       ? new Date(period1Input)
       : new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const period2 = period2Input ? new Date(period2Input) : now;
 
-    // Validate that period1 <= period2 (optional)
+    // validate that period1 <= period2
     if (period1 > period2) {
       throw new Error("period1 must be earlier than or equal to period2");
     }
@@ -17,7 +18,7 @@ export async function getHistoricalData(symbol, period1Input, period2Input) {
     const result = await yahooFinance.chart(symbol, {
       period1,
       period2,
-      interval: "1d",
+      interval: "1", // or "1mo" or "1wk"
     });
 
     if (process.env.NODE_ENV !== "production") {
