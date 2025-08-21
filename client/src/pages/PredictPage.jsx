@@ -159,6 +159,8 @@ const PredictPage = () => {
         !predictJson.predictedPrice ||
         isNaN(predictJson.predictedPrice)
       ) {
+        window.location.href =
+          "https://ai-stock-prediction-ml-service-1.onrender.com/health";
         alert(predictJson.message || "Prediction failed.");
         return;
       }
