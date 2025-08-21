@@ -63,6 +63,7 @@ const PredictPage = () => {
   const handleAnalyze = async () => {
     const companyName =
       selectedCompany === "__custom__" ? customCompany.trim() : selectedCompany;
+
     const companySymbol =
       selectedCompany === "__custom__"
         ? customSymbol.trim().toUpperCase()
@@ -156,11 +157,9 @@ const PredictPage = () => {
 
       if (
         !predictJson.success ||
-        !predictJson.predictedPrice ||
+        predictJson.predictedPrice == null ||
         isNaN(predictJson.predictedPrice)
       ) {
-        window.location.href =
-          "https://ai-stock-prediction-ml-service-1.onrender.com/health";
         alert(predictJson.message || "Prediction failed.");
         return;
       }
@@ -190,13 +189,17 @@ const PredictPage = () => {
       });
 
       setAnalysisResult(
-        `Predicted price for ${companyName} (${companySymbol}) on ${predictedDate}   ---->   ${predictJson.predictedPrice}`
+        `Predicted price for ${companyName} (${companySymbol}) on ${predictedDate} → ${predictJson.predictedPrice}`
       );
     } catch (err) {
       console.error("Error during analysis:", err);
-      alert(
-        "FLASK/PYTHON :: An error occurred during analysis. Please try again."
-      );
+      alert("Prediction failed. Redirecting to health check...");
+
+      setTimeout(() => {
+        window.location.replace(
+          "https://ai-stock-prediction-ml-service-1.onrender.com/health"
+        );
+      }, 500);
     } finally {
       setLoading(false);
     }
