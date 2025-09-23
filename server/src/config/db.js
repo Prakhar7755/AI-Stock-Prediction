@@ -6,13 +6,13 @@ let sequelize;
 if (!uri) {
   console.warn("⚠️ No DATABASE_URI found. Skipping DB init...");
 } else {
-  // Heuristic: if you're hitting *.render.com externally, require SSL.
-  const needsSSL = /render\.com/i.test(uri); // matches External URL host
+  // Enable SSL for Supabase and any external database
+  const isExternalDB = /supabase\.co|render\.com/i.test(uri);
   sequelize = new Sequelize(uri, {
     dialect: "postgres",
     logging: false,
-    ...(needsSSL && {
-      dialectOptions: { ssl: { require: true } }, // add rejectUnauthorized:false only if you hit cert issues
+    ...(isExternalDB && {
+      dialectOptions: { ssl: { require: true, rejectUnauthorized: false, } }, // add rejectUnauthorized:false only if you hit cert issues
     }),
   });
 }
@@ -22,8 +22,12 @@ export const connectDB = async () => {
     console.warn("⚠️ Sequelize not initialized (no DATABASE_URI).");
     return;
   }
-  await sequelize.authenticate();
-  console.log("✅ PostgreSQL connected via Sequelize.");
+  try {
+    await sequelize.authenticate();
+    console.log("✅ PostgreSQL connected via Sequelize.");
+  } catch (error) {
+    console.error("🔥 Failed to connect to the database:", error.message);
+  }
 };
 
 export { sequelize };

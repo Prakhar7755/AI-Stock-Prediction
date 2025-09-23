@@ -132,7 +132,7 @@ dist
 
 
 *.md
-
+db.md
 
 # Ignore virtual environment
 venv/

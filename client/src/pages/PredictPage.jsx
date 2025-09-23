@@ -150,7 +150,7 @@ const PredictPage = () => {
       const predictRes = await api.post("/predict", {
         symbol: companySymbol,
         data: historicalData,
-        method, // "average" or "linear-regression"
+        method, // "average" or "linear-regression" or "polynomial-regression"
       });
 
       const predictJson = predictRes.data;
@@ -309,6 +309,7 @@ const PredictPage = () => {
           >
             <option value="linear-regression">Linear Regression</option>
             <option value="average">Average</option>
+            <option value="polynomial-regression">Polynomial Regression</option>
           </select>
         </div>
 
