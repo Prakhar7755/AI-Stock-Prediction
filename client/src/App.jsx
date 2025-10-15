@@ -1,15 +1,20 @@
+import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home.jsx";
-import PredictPage from "./pages/PredictPage.jsx";
-import SelectedCompanyPage from "./pages/SelectedCompanyPage.jsx";
+
+// Lazy load pages
+const Home = lazy(() => import("./pages/Home.jsx"));
+const PredictPage = lazy(() => import("./pages/PredictPage.jsx"));
+const SelectedCompanyPage = lazy(() => import("./pages/SelectedCompanyPage.jsx"));
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/predict" element={<PredictPage />} />
-      <Route path="/selectedCompany" element={<SelectedCompanyPage />} />
-    </Routes>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/predict" element={<PredictPage />} />
+        <Route path="/selectedCompany" element={<SelectedCompanyPage />} />
+      </Routes>
+    </Suspense>
   );
 }
 

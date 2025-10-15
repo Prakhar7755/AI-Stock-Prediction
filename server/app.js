@@ -26,12 +26,22 @@ app.use(express.urlencoded({ extended: true, limit: "400kb" }));
 app.use(
   helmet({
     hsts: {
-      maxAge: 63072000, // 2 years in seconds
+      maxAge: 63072000, // 2 years
       includeSubDomains: true,
       preload: true,
     },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "blob:"], // allow blob: images
+        scriptSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
   })
 );
+
 
 // ---------------------------
 // CORS Setup (Dev Only)
