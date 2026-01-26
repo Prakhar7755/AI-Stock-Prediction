@@ -1,5 +1,5 @@
 # -------- Stage 1: Build React frontend --------
-FROM node:20 as client-build
+FROM node:22 as client-build
 
 WORKDIR /app/client
 
