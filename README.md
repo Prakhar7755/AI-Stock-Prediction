@@ -8,7 +8,7 @@ Users can search for companies, visualize stock trends, and get predictive insig
 ## 🔗 Project Links
 
 - **Code Repository:** [GitHub](https://github.com/Prakhar7755/AI-Stock-Prediction)  
-- **Live Website:** [Render Deployment](https://ai-stock-prediction-dfv1.onrender.com/)  
+- **Live Website:** [Render Deployment](https://ai-stock-prediction-ml-service-1.onrender.com/health)  
 - **Demo Video:** [Google Drive](https://drive.google.com/file/d/1Uzq5FFI_bJI5RlrJUe-yb9VJWc9CC8N7/view)  
 
 ---
