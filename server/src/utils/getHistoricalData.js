@@ -1,16 +1,16 @@
-import yahooFinance from "yahoo-finance2";
+import YahooFinance from "yahoo-finance2";
+
+const yahooFinance = new YahooFinance();
 
 export async function getHistoricalData(symbol, period1Input, period2Input) {
   try {
     const now = new Date();
 
-    // parse input dates or fallback to default last 7 days
     const period1 = period1Input
       ? new Date(period1Input)
       : new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const period2 = period2Input ? new Date(period2Input) : now;
 
-    // validate that period1 <= period2
     if (period1 > period2) {
       throw new Error("period1 must be earlier than or equal to period2");
     }
@@ -19,32 +19,21 @@ export async function getHistoricalData(symbol, period1Input, period2Input) {
       period1,
       period2,
       interval: "1d",
-      // ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h","1d", "5d", "1wk", "1mo", "3mo"]
     });
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log(`${symbol} result:`, JSON.stringify(result, null, 2));
-    }
+    if (!result?.quotes?.length) return null;
 
-    if (!result || !result.quotes || result.quotes.length === 0) {
-      return null;
-    }
-
-    const formatted = result.quotes.map((q) => ({
-      date: (typeof q.date === "string"
-        ? q.date
-        : q.date?.toISOString()
-      )?.split("T")[0],
+    return result.quotes.map((q) => ({
+      date: q.date.toISOString().split("T")[0],
       open: q.open,
       high: q.high,
       low: q.low,
       close: q.close,
       volume: q.volume,
     }));
-
-    return formatted;
   } catch (err) {
-    console.error("❌ Failed to fetch the data:", err);
+    console.error("❌ Failed to fetch stock data:", err);
     return null;
   }
 }
+

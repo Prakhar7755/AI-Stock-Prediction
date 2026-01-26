@@ -7,12 +7,12 @@ if (!uri) {
   console.warn("⚠️ No DATABASE_URI found. Skipping DB init...");
 } else {
   // Enable SSL for Supabase and any external database
-  const isExternalDB = /supabase\.co|render\.com/i.test(uri);
+  const isExternalDB = /supabase\.co|render\.com|neon\.tech/i.test(uri);
   sequelize = new Sequelize(uri, {
     dialect: "postgres",
     logging: false,
     ...(isExternalDB && {
-      dialectOptions: { ssl: { require: true, rejectUnauthorized: false, } }, // add rejectUnauthorized:false only if you hit cert issues
+      dialectOptions: { ssl: { require: true, rejectUnauthorized: false } }, 
     }),
   });
 }

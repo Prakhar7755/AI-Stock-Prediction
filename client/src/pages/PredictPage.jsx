@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import api from "../lib/axios.js";
-import "chart.js/auto";
+import "../lib/chartjsSetup.js"; // Ensure Chart.js scales & elements are registered
 
 const PredictPage = () => {
   const [selectedCompany, setSelectedCompany] = useState("");
@@ -9,7 +9,6 @@ const PredictPage = () => {
   const [customCompany, setCustomCompany] = useState("");
   const [customSymbol, setCustomSymbol] = useState("");
   const [period1, setPeriod1] = useState("");
-  // const [period2, setPeriod2] = useState("");
   const [period2, setPeriod2] = useState(
     new Date(Date.now() - 86400000).toISOString().split("T")[0]
   );
@@ -20,19 +19,17 @@ const PredictPage = () => {
   const [companies, setCompanies] = useState([]);
   const [companiesLoading, setCompaniesLoading] = useState(true);
 
-  // fetch all companies
+  // Fetch all companies
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
         const res = await api.get("/company");
         const json = res.data;
-
-        if (!json.success || !Array.isArray(json.companies)) {
+        if (json.success && Array.isArray(json.companies)) {
+          setCompanies(json.companies);
+        } else {
           console.warn("Failed to load companies:", json.message);
-          return;
         }
-
-        setCompanies(json.companies);
       } catch (err) {
         console.error(
           "Error fetching companies:",
@@ -42,15 +39,13 @@ const PredictPage = () => {
         setCompaniesLoading(false);
       }
     };
-
     fetchCompanies();
   }, []);
 
-  // Handle company selection (dropdown)
+  // Handle company dropdown
   const handleCompanyChange = (e) => {
     const value = e.target.value;
     setSelectedCompany(value);
-
     if (value === "__custom__") {
       setSymbol("");
     } else {
@@ -59,11 +54,10 @@ const PredictPage = () => {
     }
   };
 
-  // Core logic for analysis
+  // Core analysis
   const handleAnalyze = async () => {
     const companyName =
       selectedCompany === "__custom__" ? customCompany.trim() : selectedCompany;
-
     const companySymbol =
       selectedCompany === "__custom__"
         ? customSymbol.trim().toUpperCase()
@@ -73,45 +67,36 @@ const PredictPage = () => {
       alert("Please fill in all fields correctly.");
       return;
     }
-
     if (new Date(period1) >= new Date(period2)) {
       alert("Start date must be before end date.");
       return;
     }
-
     if (new Date(period2) > new Date()) {
       alert("End date cannot be in the future.");
       return;
     }
 
     setLoading(true);
+    setAnalysisResult(null);
+    setChartData(null);
 
     try {
-      // reset      the states
-      setAnalysisResult(null);
-      setChartData(null);
-
-      // 1) save the new company to DB
+      // Save custom company to DB
       if (selectedCompany === "__custom__") {
         const alreadyExists = companies.some(
-          (comp) =>
-            comp.name.trim().toLowerCase() === companyName.toLowerCase() ||
-            comp.symbol.toUpperCase() === companySymbol.toUpperCase()
+          (c) =>
+            c.name.trim().toLowerCase() === companyName.toLowerCase() ||
+            c.symbol.toUpperCase() === companySymbol.toUpperCase()
         );
-
         if (!alreadyExists) {
           try {
             const saveRes = await api.post("/company", {
               name: companyName,
               symbol: companySymbol,
             });
-
             const saveJson = saveRes.data;
-
             if (saveJson.success && saveJson.data) {
               setCompanies((prev) => [...prev, saveJson.data]);
-            } else {
-              console.warn("Failed to save company:", saveJson.message);
             }
           } catch (saveErr) {
             console.error("Error saving company:", saveErr);
@@ -119,23 +104,19 @@ const PredictPage = () => {
         }
       }
 
-      // 2) get historical stock data
+      // Fetch historical stock data
       const stockRes = await api.post("/stock", {
         name: companyName,
         symbol: companySymbol,
         period1,
         period2,
       });
-
       const stockJson = stockRes.data;
-
       if (!stockJson.success || !Array.isArray(stockJson.data)) {
         alert(stockJson.message || "Failed to fetch stock data.");
         return;
       }
-
       const historicalData = stockJson.data;
-
       if (historicalData.length === 0) {
         alert("No historical data found for the given period.");
         return;
@@ -143,18 +124,16 @@ const PredictPage = () => {
 
       const labels = historicalData.map((entry) => entry.date);
       const closePrices = historicalData.map((entry) =>
-        parseFloat(entry.close.toFixed(2))
+        Number(entry.close.toFixed(2))
       );
 
-      // 3) get prediction from backend
+      // Get prediction
       const predictRes = await api.post("/predict", {
         symbol: companySymbol,
         data: historicalData,
-        method, // "average" or "linear-regression" or "polynomial-regression"
+        method,
       });
-
       const predictJson = predictRes.data;
-
       if (
         !predictJson.success ||
         predictJson.predictedPrice == null ||
@@ -164,6 +143,7 @@ const PredictPage = () => {
         return;
       }
 
+      // Add predicted value
       const lastDate = new Date(labels[labels.length - 1]);
       lastDate.setDate(lastDate.getDate() + 1);
       const predictedDate = lastDate.toISOString().split("T")[0];
@@ -171,6 +151,7 @@ const PredictPage = () => {
       const updatedLabels = [...labels, predictedDate];
       const updatedPrices = [...closePrices, predictJson.predictedPrice];
 
+      // Update chart
       setChartData({
         labels: updatedLabels,
         datasets: [
@@ -193,13 +174,7 @@ const PredictPage = () => {
       );
     } catch (err) {
       console.error("Error during analysis:", err);
-      alert("Prediction failed. Redirecting to health check...");
-
-      setTimeout(() => {
-        window.location.replace(
-          "https://ai-stock-prediction-ml-service-1.onrender.com/health"
-        );
-      }, 500);
+      alert("Prediction failed. Check backend service or health endpoint.");
     } finally {
       setLoading(false);
     }
@@ -215,14 +190,14 @@ const PredictPage = () => {
       <h1 className="text-3xl font-bold mb-8 text-center text-primary">
         Predict Stock Prices
       </h1>
+
       <div className="grid gap-6">
         {/* Company Selector */}
         <div>
-          <label htmlFor="company-select" className="label">
+          <label className="label">
             <span className="label-text">Select Company</span>
           </label>
           <select
-            id="company-select"
             className="select select-bordered w-full"
             value={selectedCompany}
             onChange={handleCompanyChange}
@@ -242,15 +217,14 @@ const PredictPage = () => {
           </select>
         </div>
 
-        {/* Conditional Input for Custom Entry */}
+        {/* Custom Company Input */}
         {selectedCompany === "__custom__" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="custom-company" className="label">
-                <span className="label-text">Enter Company Name</span>
+              <label className="label">
+                <span className="label-text">Company Name</span>
               </label>
               <input
-                id="custom-company"
                 type="text"
                 className="input input-bordered w-full"
                 value={customCompany}
@@ -258,21 +232,11 @@ const PredictPage = () => {
                 placeholder="e.g., MyStartup Inc."
               />
             </div>
-
             <div>
-              <label htmlFor="custom-symbol" className="label">
-                <span className="label-text">
-                  Enter Company Symbol
-                  <span
-                    className="tooltip ml-1"
-                    data-tip="e.g., SBIN.NS, INFY.BO, TCS.NS"
-                  >
-                    ❔
-                  </span>
-                </span>
+              <label className="label">
+                <span className="label-text">Company Symbol</span>
               </label>
               <input
-                id="custom-symbol"
                 type="text"
                 className="input input-bordered w-full uppercase"
                 value={customSymbol}
@@ -283,11 +247,10 @@ const PredictPage = () => {
           </div>
         ) : (
           <div>
-            <label htmlFor="readonly-symbol" className="label">
+            <label className="label">
               <span className="label-text">Company Symbol</span>
             </label>
             <input
-              id="readonly-symbol"
               type="text"
               className="input input-bordered w-full"
               value={symbol}
@@ -298,11 +261,10 @@ const PredictPage = () => {
 
         {/* Prediction Method */}
         <div>
-          <label htmlFor="method-select" className="label">
+          <label className="label">
             <span className="label-text">Prediction Method</span>
           </label>
           <select
-            id="method-select"
             className="select select-bordered w-full"
             value={method}
             onChange={(e) => setMethod(e.target.value)}
@@ -313,27 +275,24 @@ const PredictPage = () => {
           </select>
         </div>
 
-        {/* Date Range Picker */}
+        {/* Date Range */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="start-date" className="label">
+            <label className="label">
               <span className="label-text">Start Date</span>
             </label>
             <input
-              id="start-date"
               type="date"
               className="input input-bordered w-full"
               value={period1}
               onChange={(e) => setPeriod1(e.target.value)}
             />
           </div>
-
           <div>
-            <label htmlFor="end-date" className="label">
+            <label className="label">
               <span className="label-text">End Date</span>
             </label>
             <input
-              id="end-date"
               type="date"
               className="input input-bordered w-full"
               value={period2}
@@ -368,7 +327,7 @@ const PredictPage = () => {
         </div>
       </div>
 
-      {/* Loading Spinner While Processing */}
+      {/* Loading */}
       {loading && (
         <div className="mt-6 text-center">
           <span className="loading loading-spinner text-primary loading-lg"></span>
@@ -376,14 +335,35 @@ const PredictPage = () => {
         </div>
       )}
 
-      {/* Result Section */}
+      {/* Result */}
       {analysisResult && (
         <div className="mt-10 text-center text-lg text-base-content/80">
           {analysisResult}
         </div>
       )}
 
-      {/* NO CHART */}
+      {/* Chart */}
+      {chartData && (
+        <div className="mt-10 bg-base-200 p-6 rounded-box">
+          <Line
+            key={chartData.labels.join("-")} // unique key to avoid canvas reuse
+            data={chartData}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: { position: "top" },
+                title: { display: true, text: "Stock Price Prediction" },
+              },
+              scales: {
+                x: { type: "category" },
+                y: { beginAtZero: false },
+              },
+            }}
+          />
+        </div>
+      )}
+
+      {/* No chart placeholder */}
       {!chartData && !loading && !analysisResult && (
         <div className="mt-10 text-center text-base-content/60">
           Start by selecting a company and date range to predict stock prices.
@@ -394,13 +374,6 @@ const PredictPage = () => {
             {" "}
             CLICK HERE FOR ANY ERROR
           </a>
-        </div>
-      )}
-
-      {/* Chart Section */}
-      {chartData && (
-        <div className="mt-10 bg-base-200 p-6 rounded-box">
-          <Line data={chartData} />
         </div>
       )}
     </div>

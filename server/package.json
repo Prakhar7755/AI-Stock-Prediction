@@ -20,7 +20,7 @@
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7",
-    "yahoo-finance2": "^2.13.3"
+    "yahoo-finance2": "^3.11.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
