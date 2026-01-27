@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import { DATABASE_URI } from "./env";
+import { DATABASE_URI } from "./env.js";
 
 const uri = DATABASE_URI;
 let sequelize;
