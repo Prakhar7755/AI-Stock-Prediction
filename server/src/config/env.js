@@ -1,7 +1,12 @@
 import dotenv from "dotenv";
 
-dotenv.config();
 
-/* if (!process.env.JWT_SECRET) {
-  throw new Error("JWT_SECRET environment variable is required but not set.");
-} */
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config(); // only load .env locally
+}
+
+// Now all variables are available via process.env
+export const PORT = process.env.PORT || 5001;
+export const DATABASE_URI = process.env.DATABASE_URI;
+export const ML_SERVICE_URL = process.env.ML_SERVICE_URL;
+export const CORS_ORIGIN = process.env.CORS_ORIGIN;

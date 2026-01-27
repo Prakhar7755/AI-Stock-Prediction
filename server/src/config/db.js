@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
+import { DATABASE_URI } from "./env";
 
-const uri = process.env.DATABASE_URI;
+const uri = DATABASE_URI;
 let sequelize;
 
 if (!uri) {
@@ -12,7 +13,7 @@ if (!uri) {
     dialect: "postgres",
     logging: false,
     ...(isExternalDB && {
-      dialectOptions: { ssl: { require: true, rejectUnauthorized: false } }, 
+      dialectOptions: { ssl: { require: true, rejectUnauthorized: false } },
     }),
   });
 }
