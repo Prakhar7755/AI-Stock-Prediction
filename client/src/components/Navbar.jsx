@@ -2,12 +2,16 @@ import { Link } from "react-router-dom";
 
 export default function Navbar() {
   return (
-    <div className="navbar bg-base-100 shadow-sm">
-      <div className="flex-none">
-        <label htmlFor="my-drawer" className="btn btn-square btn-ghost">
+    <div className="navbar bg-base-100 shadow-md px-4">
+      <div className="navbar-start">
+        <label
+          htmlFor="my-drawer"
+          className="btn btn-ghost btn-square "
+        >
           <svg
-            className="inline-block h-5 w-5 stroke-current"
+            className="h-5 w-5"
             fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
             <path
@@ -19,15 +23,20 @@ export default function Navbar() {
           </svg>
         </label>
       </div>
-      <div className="flex-1 text-center text-6xl lg:text-2xl font-bold tracking-wide text-primary hover:text-primary-focus transition duration-200">
-        <Link to={"/"} className="ml-28 btn btn-ghost text-xl">
-          AI STOCK PREDICTION
+
+      <div className="navbar-center">
+        <Link
+          to="/"
+          className="text-lg sm:text-xl lg:text-2xl font-bold tracking-wide text-primary hover:text-primary-focus transition"
+        >
+          AI Stock Prediction
         </Link>
       </div>
-      <div className="flex-none">
+
+      <div className="navbar-end">
         <Link to="/predict">
-          <button className="btn bg-blue-500 btn-sm px-4 text-sm shadow hover:scale-105 transition-transform duration-200">
-            CUSTOM ANALYSIS
+          <button className="btn btn-primary btn-sm sm:btn-md shadow hover:scale-105 transition-transform">
+            Custom Analysis
           </button>
         </Link>
       </div>
