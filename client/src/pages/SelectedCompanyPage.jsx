@@ -110,20 +110,49 @@ const SelectedCompanyPage = () => {
   }, [fetchData]);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-6 text-center text-primary">
-        Stock Analysis
-      </h1>
+    <div className="max-w-6xl mx-auto px-4 py-10 space-y-8">
+      <div className="text-center">
+        <div className="badge badge-primary badge-outline mb-2">
+          Market Analysis
+        </div>
+        <h1 className="text-4xl font-black text-base-content">
+          {companyName}{" "}
+          <span className="text-base-content/40 text-2xl font-normal">
+            ({symbol})
+          </span>
+        </h1>
+      </div>
 
-      {loading && <p className="text-center">Loading...</p>}
+      {loading && (
+        <div className="flex justify-center py-20">
+          <span className="loading loading-bars loading-lg text-primary"></span>
+        </div>
+      )}
 
       {!loading && analysisResult && (
-        <div className="text-center mb-6">{analysisResult}</div>
+        <div className="alert alert-info shadow-lg max-w-2xl mx-auto">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="stroke-current shrink-0 w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <span className="font-medium">{analysisResult}</span>
+        </div>
       )}
 
       {!loading && chartData && (
-        <div className="bg-base-200 p-6 rounded-box">
-          <Line data={chartData} />
+        <div className="card bg-base-100 shadow-xl border border-base-200">
+          <div className="card-body p-4 sm:p-8">
+            <Line data={chartData} />
+          </div>
         </div>
       )}
     </div>

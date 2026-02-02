@@ -8,6 +8,7 @@ import Sidebar from "./components/Sidebar.jsx";
 
 import App from "./App.jsx";
 import "./index.css";
+import "./lib/chartjsSetup.js"; // Register Chart.js components globally
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
