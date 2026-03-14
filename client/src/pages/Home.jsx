@@ -26,11 +26,27 @@ export default function Home() {
             .
           </p>
 
-          <Link to="/predict">
-            <button className="btn btn-primary btn-lg px-12 rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-lg font-bold">
-              Get Started Now
-            </button>
-          </Link>
+          <div className="flex flex-col items-center space-y-4">
+            <Link to="/predict" className="w-full max-w-xs">
+              <button className="btn btn-primary btn-lg px-12 rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-lg font-bold w-full">
+                Get Started Now
+              </button>
+            </Link>
+            <div className="flex justify-center space-x-4 w-full max-w-xs">
+              <a
+                href="https://drive.google.com/file/d/1Uzq5FFI_bJI5RlrJUe-yb9VJWc9CC8N7/view"
+                className="btn btn-info btn-lg px-12 rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-lg font-bold"
+              >
+                Demo
+              </a>
+              <a
+                href="https://github.com/Prakhar7755/AI-Stock-Prediction"
+                className="btn bg-gray-700 text-white btn-lg px-12 rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-lg font-bold"
+              >
+                Github Code
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
